@@ -4,12 +4,30 @@ provider:
   name: aws
   region: eu-central-1
   stage: ${opt:stage, 'prod'}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Resource:
+            - !GetAtt CacheTable.Arn
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
   ecr:
     images:
       auto_tldr:
         path: ./
   environment:
     APP_ENV: ${self:provider.stage}
+    APP_SECRET: !Join [ '', [ '{{resolve:secretsmanager:', !Ref AppSecret, ':SecretString:secret}}' ] ]
+    DYNAMODB_CACHE_TABLE: !Ref CacheTable
+    LEMMY_PASSWORD: ${env:LEMMY_PASSWORD}
+    LEMMY_USER: ${env:LEMMY_USER}
 
 functions:
   cron:
@@ -19,5 +37,33 @@ functions:
     timeout: 300
     events:
       - schedule:
-          rate: rate(2 minutes)
+          rate: rate(5 minutes)
           input: '"app:reply"'
+
+resources:
+  Resources:
+    CacheTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        BillingMode: PAY_PER_REQUEST
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+    AppSecret:
+      Type: AWS::SecretsManager::Secret
+      Properties:
+        Description: Lemmy LinkFixer bot app secret
+        GenerateSecretString:
+          SecretStringTemplate: '{}'
+          GenerateStringKey: "secret"
+          PasswordLength: 32
+          RequireEachIncludedType: true
+          ExcludeUppercase: true
+          ExcludePunctuation: true
+          ExcludeCharacters: ghijklmnopqrstuvwxyz

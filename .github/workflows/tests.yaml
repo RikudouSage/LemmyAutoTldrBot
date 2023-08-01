@@ -1,0 +1,46 @@
+name: Tests
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  code_style:
+    name: Test code style
+    runs-on: ubuntu-latest
+    env:
+      PHP_CS_FIXER_IGNORE_ENV: 1
+    strategy:
+      matrix:
+        version: ['8.2']
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.version }}
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: composer install
+      - name: Test code style
+        run: composer fixer -- --dry-run
+  static_analysis:
+    name: Static analysis
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ['8.2']
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.version }}
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: composer install
+      - name: Run static analysis
+        run: composer phpstan
+

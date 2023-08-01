@@ -10,6 +10,7 @@
         "nyholm/psr7": "^1.8",
         "rikudou/lemmy-api": "^0.2.1",
         "rikudou/memoize-bundle": "^1.0",
+        "rikudou/psr6-dynamo-db-bundle": "^4.0",
         "symfony/browser-kit": "6.3.*",
         "symfony/console": "6.3.*",
         "symfony/css-selector": "6.3.*",
