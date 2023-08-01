@@ -1,0 +1,12 @@
+# Default configuration for extension with alias: "rikudou_memoize"
+rikudou_memoize:
+
+    # Whether memoization is enabled or not.
+    enabled:              true
+
+    # The default memoization period if none is specified in attribute. -1 means until end of request.
+    default_memoize_seconds: 86400
+
+    # The default cache service to use. If default_memoize_seconds is set to -1 this setting is ignored and internal service is used.
+    cache_service:        cache.app
+

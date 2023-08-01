@@ -1,0 +1,23 @@
+service: LemmyAutoTldrBot
+
+provider:
+  name: aws
+  region: eu-central-1
+  stage: ${opt:stage, 'prod'}
+  ecr:
+    images:
+      auto_tldr:
+        path: ./
+  environment:
+    APP_ENV: ${self:provider.stage}
+
+functions:
+  cron:
+    image:
+      name: auto_tldr
+    memorySize: 512
+    timeout: 300
+    events:
+      - schedule:
+          rate: rate(2 minutes)
+          input: '"app:reply"'
