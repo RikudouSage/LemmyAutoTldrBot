@@ -15,6 +15,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       LEMMY_PASSWORD: ${{ secrets.LEMMY_PASSWORD }}
       LEMMY_USER: ${{ secrets.LEMMY_USER }}
+      AWS_REGION: eu-central-1
     steps:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
