@@ -25,6 +25,7 @@ final class ReplyToPostsCommand extends Command
         private readonly SiteHandlerCollection $siteHandler,
         private readonly SummaryProvider $summaryProvider,
         private readonly string $instance,
+        private readonly string $sourceCodeLink,
     ) {
         parent::__construct();
     }
@@ -74,7 +75,7 @@ final class ReplyToPostsCommand extends Command
                     continue;
                 }
 
-                $response = "This is the best summary I could come up with:\n\n---\n\n" . implode("\n\n", $summary);
+                $response = "This is the best summary I could come up with:\n\n---\n\n" . implode("\n\n", $summary) . "\n\n---\n\nI'm a bot and I'm [open source]({$this->sourceCodeLink})!";
 
                 try {
                     $this->api->comment()->create(

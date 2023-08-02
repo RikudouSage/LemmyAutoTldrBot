@@ -52,3 +52,4 @@ services:
     App\Command\ReplyToPostsCommand:
         arguments:
             $instance: '%lemmy.instance%'
+            $sourceCodeLink: '%env(SOURCE_CODE_LINK)%'
