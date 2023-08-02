@@ -31,7 +31,7 @@ RUN curl -sL https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON
     make altinstall && \
     cd .. && rm -rf Python-${PYTHON_VERSION}
 
-COPY . /var/task
+COPY --chmod=777 . /var/task
 WORKDIR /var/task
 
 # Handle dependencies, build stuff
@@ -51,7 +51,6 @@ RUN composer install --no-dev --no-scripts && \
 # Lambda
 RUN cp lambda/bootstrap.php /var/runtime/bootstrap && \
     cd /opt && \
-    composer require guzzlehttp/guzzle && \
-    chmod -R +rx /var/task
+    composer require guzzlehttp/guzzle
 
 CMD [ "bin/console" ]
