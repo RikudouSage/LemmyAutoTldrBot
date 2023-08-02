@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 #[Memoizable]
 #[Memoize]
-final class NcbNewsSiteHandler implements SiteHandler
+final class NbcNewsSiteHandler implements SiteHandler
 {
     public function __construct(
         private HttpBrowser $browser,
