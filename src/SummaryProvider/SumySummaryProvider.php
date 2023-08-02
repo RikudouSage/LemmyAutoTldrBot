@@ -12,7 +12,10 @@ final class SumySummaryProvider implements SummaryProvider
     #[Memoize]
     public function getSummary(string $text, int $sentences): array
     {
-        $text = str_replace('"', '\"', $text);
+        $text = strtr($text, [
+            '"' => '\"',
+            '$' => '\$',
+        ]);
         $script = __DIR__ . '/../../python/summarizer';
         $currentDir = getcwd() ?: throw new RuntimeException('Getting current directory failed');
         chdir(dirname($script));
