@@ -32,7 +32,7 @@ final class ReplyToPostsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $community = null;
-        $community = $this->api->community()->get('bot_playground');
+        //        $community = $this->api->community()->get('bot_playground');
 
         $lastHandledIdCache = $this->cache->getItem('lastHandled');
         if ($lastHandledIdCache->isHit()) {
@@ -69,6 +69,10 @@ final class ReplyToPostsCommand extends Command
                     continue;
                 }
                 $summary = $this->summaryProvider->getSummary($text, 5);
+                if (!$summary) {
+                    error_log("Failed generating summary for {$post->post->url}");
+                    continue;
+                }
 
                 $response = "This is the best summary I could come up with:\n\n---\n\n" . implode("\n\n", $summary);
 
