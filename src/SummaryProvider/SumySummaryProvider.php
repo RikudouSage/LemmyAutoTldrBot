@@ -2,10 +2,14 @@
 
 namespace App\SummaryProvider;
 
+use Rikudou\MemoizeBundle\Attribute\Memoizable;
+use Rikudou\MemoizeBundle\Attribute\Memoize;
 use RuntimeException;
 
+#[Memoizable]
 final class SumySummaryProvider implements SummaryProvider
 {
+    #[Memoize]
     public function getSummary(string $text, int $sentences): array
     {
         $text = str_replace('"', '\"', $text);
