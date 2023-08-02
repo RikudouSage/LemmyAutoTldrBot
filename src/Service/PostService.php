@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use DateTimeImmutable;
 use Rikudou\LemmyApi\Enum\ListingType;
 use Rikudou\LemmyApi\Enum\SortType;
 use Rikudou\LemmyApi\LemmyApi;
@@ -33,6 +34,9 @@ final readonly class PostService
                 listingType: ListingType::All,
             );
             foreach ($posts as $post) {
+                if ($post->post->published > new DateTimeImmutable()) {
+                    continue;
+                }
                 if ($post->post->id > $untilId && $i < $limit) {
                     yield $post;
                 } else {
