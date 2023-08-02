@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 #[Memoizable]
 #[Memoize]
-final readonly class ReutersSiteHandler implements SiteHandler
+final readonly class WashingtonPostSiteHandler implements SiteHandler
 {
     public function __construct(
         private HttpBrowser $browser,
@@ -23,21 +23,15 @@ final readonly class ReutersSiteHandler implements SiteHandler
             return false;
         }
 
-        return $host === 'www.reuters.com';
+        return $host === 'www.washingtonpost.com';
     }
 
     public function getContent(string $url): string
     {
         $crawler = $this->browser->request(Request::METHOD_GET, $url);
-        $parts = $crawler->filter('[class^="article-body__content"] > p');
+        $parts = $crawler->filter('.article-body > p');
         $content = '';
-        $count = count($parts);
-        $i = 0;
         foreach ($parts as $part) {
-            ++$i;
-            if ($i === $count) {
-                break;
-            }
             $content .= $part->nodeValue . "\n\n";
         }
 

@@ -35,6 +35,9 @@ final class ManualRunCommand extends Command
     {
         $url = $input->getArgument('url');
         $content = $this->siteHandler->getContent($url);
+        if (!$content) {
+            return self::FAILURE;
+        }
         $summary = $this->summaryProvider->getSummary($content, 5);
 
         $io = new SymfonyStyle($input, $output);

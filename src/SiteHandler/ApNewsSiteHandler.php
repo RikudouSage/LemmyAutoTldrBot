@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 #[Memoizable]
 #[Memoize]
-final class ApNewsSiteHandler implements SiteHandler
+final readonly class ApNewsSiteHandler implements SiteHandler
 {
     public function __construct(
         private HttpBrowser $browser,

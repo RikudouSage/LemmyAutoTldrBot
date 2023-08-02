@@ -29,7 +29,7 @@ final class ReplyToPostsCommand extends Command
         parent::__construct();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $community = null;
         $community = $this->api->community()->get('bot_playground');
@@ -64,6 +64,10 @@ final class ReplyToPostsCommand extends Command
 
             try {
                 $text = $this->siteHandler->getContent($post->post->url);
+                if (!$text) {
+                    error_log("Failed reading text for {$post->post->url}");
+                    continue;
+                }
                 $summary = $this->summaryProvider->getSummary($text, 5);
 
                 $response = "This is the best summary I could come up with:\n\n---\n\n" . implode("\n\n", $summary);
