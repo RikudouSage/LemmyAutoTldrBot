@@ -26,6 +26,7 @@ final class ReplyToPostsCommand extends Command
         private readonly SummaryProvider $summaryProvider,
         private readonly string $instance,
         private readonly string $sourceCodeLink,
+        private readonly int $batchLimit,
     ) {
         parent::__construct();
     }
@@ -46,6 +47,7 @@ final class ReplyToPostsCommand extends Command
 
         $posts = $this->api->post()->getPosts(
             community: $community,
+            limit: $this->batchLimit,
             sort: SortType::New,
             listingType: ListingType::All,
         );

@@ -53,3 +53,4 @@ services:
         arguments:
             $instance: '%lemmy.instance%'
             $sourceCodeLink: '%env(SOURCE_CODE_LINK)%'
+            $batchLimit: '%env(POST_BATCH_LIMIT)%'
