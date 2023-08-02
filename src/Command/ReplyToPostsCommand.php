@@ -3,12 +3,11 @@
 namespace App\Command;
 
 use App\Exception\ContentFetchingFailedException;
+use App\Service\PostService;
 use App\Service\SiteHandlerCollection;
 use App\SummaryProvider\SummaryProvider;
 use Psr\Cache\CacheItemPoolInterface;
 use Rikudou\LemmyApi\Enum\Language;
-use Rikudou\LemmyApi\Enum\ListingType;
-use Rikudou\LemmyApi\Enum\SortType;
 use Rikudou\LemmyApi\Exception\LanguageNotAllowedException;
 use Rikudou\LemmyApi\LemmyApi;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -24,18 +23,15 @@ final class ReplyToPostsCommand extends Command
         private readonly CacheItemPoolInterface $cache,
         private readonly SiteHandlerCollection $siteHandler,
         private readonly SummaryProvider $summaryProvider,
+        private readonly PostService $postService,
         private readonly string $instance,
         private readonly string $sourceCodeLink,
-        private readonly int $batchLimit,
     ) {
         parent::__construct();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $community = null;
-        //        $community = $this->api->community()->get('bot_playground');
-
         $lastHandledIdCache = $this->cache->getItem('lastHandled');
         if ($lastHandledIdCache->isHit()) {
             $lastHandledId = $lastHandledIdCache->get();
@@ -45,12 +41,7 @@ final class ReplyToPostsCommand extends Command
         assert(is_int($lastHandledId));
         $storedLastHandledId = $lastHandledId;
 
-        $posts = $this->api->post()->getPosts(
-            community: $community,
-            limit: $this->batchLimit,
-            sort: SortType::New,
-            listingType: ListingType::All,
-        );
+        $posts = $this->postService->getPosts($lastHandledId);
 
         foreach ($posts as $post) {
             if ($post->post->id <= $storedLastHandledId) {
