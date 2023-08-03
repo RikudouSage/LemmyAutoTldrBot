@@ -28,8 +28,13 @@ provider:
     APP_ENV: ${self:provider.stage}
     APP_SECRET: !Join [ '', [ '{{resolve:secretsmanager:', !Ref AppSecret, ':SecretString:secret}}' ] ]
     DYNAMODB_CACHE_TABLE: !Ref CacheTable
+    DYNAMODB_WHITELIST_BLACKLIST_TABLE: !Ref BlacklistWhitelistTable
+    DYNAMODB_WHITELIST_BLACKLIST_TABLE_TYPE_INDEX: ${self:custom.TypeIndexName}
     LEMMY_PASSWORD: ${env:LEMMY_PASSWORD}
     LEMMY_USER: ${env:LEMMY_USER}
+
+custom:
+  TypeIndexName: type-index
 
 functions:
   cron:
@@ -67,7 +72,7 @@ resources:
             AttributeType: S
         BillingMode: PAY_PER_REQUEST
         GlobalSecondaryIndexes:
-          - IndexName: type-index
+          - IndexName: ${self:custom.TypeIndexName}
             KeySchema:
               - AttributeName: type
                 KeyType: HASH
