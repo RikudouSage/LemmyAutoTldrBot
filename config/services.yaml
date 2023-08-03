@@ -5,6 +5,12 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     lemmy.instance: lemmings.world
+    instance.blacklist:
+        - lemmy.world
+    community.blacklist: []
+    instance.whitelist: []
+    community.whitelist:
+        - technology@lemmy.world
 
 services:
     # default configuration for services in *this* file
@@ -53,3 +59,10 @@ services:
         arguments:
             $instance: '%lemmy.instance%'
             $sourceCodeLink: '%env(SOURCE_CODE_LINK)%'
+
+    App\Service\PermissionChecker:
+        arguments:
+            $instanceBlacklist: '%instance.blacklist%'
+            $instanceWhitelist: '%instance.whitelist%'
+            $communityBlacklist: '%community.blacklist%'
+            $communityWhitelist: '%community.whitelist%'

@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Exception\ContentFetchingFailedException;
+use App\Service\PermissionChecker;
 use App\Service\PostService;
 use App\Service\SiteHandlerCollection;
 use App\SummaryProvider\SummaryProvider;
@@ -26,6 +27,7 @@ final class ReplyToPostsCommand extends Command
         private readonly PostService $postService,
         private readonly string $instance,
         private readonly string $sourceCodeLink,
+        private readonly PermissionChecker $permissionChecker,
     ) {
         parent::__construct();
     }
@@ -53,6 +55,10 @@ final class ReplyToPostsCommand extends Command
             }
 
             if (!$post->post->url) {
+                continue;
+            }
+
+            if (!$this->permissionChecker->canPostToCommunity($post->community)) {
                 continue;
             }
 
