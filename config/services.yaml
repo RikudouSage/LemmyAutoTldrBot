@@ -67,7 +67,7 @@ services:
             $instance: '%lemmy.instance%'
             $sourceCodeLink: '%env(SOURCE_CODE_LINK)%'
 
-    App\Service\PermissionChecker:
+    App\Service\HardcodedPermissionChecker:
         arguments:
             $instanceBlacklist: '%instance.blacklist%'
             $instanceWhitelist: '%instance.whitelist%'
