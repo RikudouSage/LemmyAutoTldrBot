@@ -10,6 +10,8 @@ provider:
         - Effect: Allow
           Resource:
             - !GetAtt CacheTable.Arn
+            - !GetAtt BlacklistWhitelistTable.Arn
+            - !Join ['/', [!GetAtt BlacklistWhitelistTable.Arn, index, '*']]
           Action:
             - dynamodb:DescribeTable
             - dynamodb:Query
