@@ -17,6 +17,7 @@ parameters:
         - dfw@lemmy.world
         - politics@lemmy.world
         - coloradopolitics@lemmy.world
+        - archaeology@lemmy.world
 
 services:
     # default configuration for services in *this* file
