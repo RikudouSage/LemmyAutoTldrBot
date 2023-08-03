@@ -45,11 +45,16 @@ abstract readonly class AbstractSiteHandler implements SiteHandler
         $i = 0;
         $ignoreLast = $this->ignoreLast();
 
+        $regex = $this->skipIfMatches();
+
         foreach ($parts as $part) {
             if ($i === $count - $ignoreLast) {
                 break;
             }
             ++$i;
+            if ($regex && $part->nodeValue && preg_match($regex, $part->nodeValue)) {
+                continue;
+            }
             $content .= $part->nodeValue . "\n\n";
         }
 
@@ -64,5 +69,10 @@ abstract readonly class AbstractSiteHandler implements SiteHandler
     protected function getUserAgent(): string
     {
         return 'LemmyAutoTldrBot';
+    }
+
+    protected function skipIfMatches(): ?string
+    {
+        return null;
     }
 }
