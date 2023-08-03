@@ -46,6 +46,15 @@ functions:
       - schedule:
           rate: rate(5 minutes)
           input: '"app:reply"'
+  cronPrivateMessages:
+    image:
+      name: auto_tldr
+    memorySize: 512
+    timeout: 300
+    events:
+      - schedule:
+          rate: rate(15 minutes)
+          input: '"app:reply-to-pms"'
 
 resources:
   Resources:

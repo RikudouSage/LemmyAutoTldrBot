@@ -73,3 +73,8 @@ services:
             $instanceWhitelist: '%instance.whitelist%'
             $communityBlacklist: '%community.blacklist%'
             $communityWhitelist: '%community.whitelist%'
+
+    App\Command\ReplyToDirectMessagesCommand:
+        arguments:
+            $currentUsername: '%env(LEMMY_USER)%'
+            $maintainer: '%env(LEMMY_MAINTAINER)%'
