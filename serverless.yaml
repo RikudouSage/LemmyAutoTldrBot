@@ -37,7 +37,7 @@ custom:
   TypeIndexName: type-index
 
 functions:
-  cron:
+  cronPosts:
     image:
       name: auto_tldr
     memorySize: 512
@@ -45,7 +45,16 @@ functions:
     events:
       - schedule:
           rate: rate(5 minutes)
-          input: '"app:reply"'
+          input: '"app:reply-to-posts"'
+  cronMentions:
+    image:
+      name: auto_tldr
+    memorySize: 512
+    timeout: 300
+    events:
+      - schedule:
+          rate: rate(5 minutes)
+          input: '"app:reply-to-mentions"'
   cronPrivateMessages:
     image:
       name: auto_tldr

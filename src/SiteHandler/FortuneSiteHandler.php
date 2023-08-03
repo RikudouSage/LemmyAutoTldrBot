@@ -18,4 +18,16 @@ final readonly class FortuneSiteHandler extends AbstractSiteHandler
     {
         return '[data-cy="articleContent"] p';
     }
+
+    public function getContent(string $url): string
+    {
+        if (str_ends_with($url, '/amp/')) {
+            $url = substr($url, 0, -strlen('/amp/'));
+        }
+        if (str_ends_with($url, '/amp')) {
+            $url = substr($url, 0, -strlen('/amp'));
+        }
+
+        return parent::getContent($url);
+    }
 }

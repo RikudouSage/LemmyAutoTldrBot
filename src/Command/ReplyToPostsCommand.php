@@ -6,6 +6,7 @@ use App\Exception\ContentFetchingFailedException;
 use App\Service\PermissionChecker;
 use App\Service\PostService;
 use App\Service\SiteHandlerCollection;
+use App\Service\SummaryTextWrapper;
 use App\SummaryProvider\SummaryProvider;
 use Psr\Cache\CacheItemPoolInterface;
 use Rikudou\LemmyApi\Enum\Language;
@@ -16,7 +17,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand('app:reply')]
+#[AsCommand('app:reply-to-posts')]
 final class ReplyToPostsCommand extends Command
 {
     public function __construct(
@@ -26,8 +27,9 @@ final class ReplyToPostsCommand extends Command
         private readonly SummaryProvider $summaryProvider,
         private readonly PostService $postService,
         private readonly string $instance,
-        private readonly string $sourceCodeLink,
         private readonly PermissionChecker $permissionChecker,
+        private readonly int $summaryParagraphs,
+        private readonly SummaryTextWrapper $summaryTextWrapper,
     ) {
         parent::__construct();
     }
@@ -68,13 +70,13 @@ final class ReplyToPostsCommand extends Command
                     error_log("Failed reading text for {$post->post->url}");
                     continue;
                 }
-                $summary = $this->summaryProvider->getSummary($text, 5);
+                $summary = $this->summaryProvider->getSummary($text, $this->summaryParagraphs);
                 if (!$summary) {
                     error_log("Failed generating summary for {$post->post->url}");
                     continue;
                 }
 
-                $response = "This is the best summary I could come up with:\n\n---\n\n" . implode("\n\n", $summary) . "\n\n---\n\nI'm a bot and I'm [open source]({$this->sourceCodeLink})!";
+                $response = $this->summaryTextWrapper->getResponseText($summary);
 
                 try {
                     $this->api->comment()->create(

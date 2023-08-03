@@ -4,6 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    app.summary_paragraphs: 6
     lemmy.instance: lemmings.world
     instance.blacklist:
         - lemmy.world
@@ -65,7 +66,7 @@ services:
     App\Command\ReplyToPostsCommand:
         arguments:
             $instance: '%lemmy.instance%'
-            $sourceCodeLink: '%env(SOURCE_CODE_LINK)%'
+            $summaryParagraphs: '%app.summary_paragraphs%'
 
     App\Service\HardcodedPermissionChecker:
         arguments:
@@ -78,3 +79,12 @@ services:
         arguments:
             $currentUsername: '%env(LEMMY_USER)%'
             $maintainer: '%env(LEMMY_MAINTAINER)%'
+
+    App\Command\ReplyToMentionsCommand:
+        arguments:
+            $maintainer: '%env(LEMMY_MAINTAINER)%'
+            $summaryParagraphs: '%app.summary_paragraphs%'
+
+    App\Service\SummaryTextWrapper:
+        arguments:
+            $sourceCodeLink: '%env(SOURCE_CODE_LINK)%'
