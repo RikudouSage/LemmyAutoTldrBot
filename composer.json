@@ -6,6 +6,7 @@
     "require": {
         "php": "^8.2",
         "ext-ctype": "*",
+        "ext-dom": "*",
         "ext-iconv": "*",
         "nyholm/psr7": "^1.8",
         "rikudou/lemmy-api": "^0.2.1",
