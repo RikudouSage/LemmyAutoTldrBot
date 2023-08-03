@@ -8,7 +8,6 @@ use Symfony\Component\BrowserKit\HttpBrowser;
 use Symfony\Component\HttpFoundation\Request;
 
 #[Memoizable]
-#[Memoize]
 abstract readonly class AbstractSiteHandler implements SiteHandler
 {
     public function __construct(
@@ -33,6 +32,7 @@ abstract readonly class AbstractSiteHandler implements SiteHandler
         return in_array($host, $this->getHostnames(), true);
     }
 
+    #[Memoize]
     public function getContent(string $url): string
     {
         $crawler = $this->browser->request(Request::METHOD_GET, $url, server: [

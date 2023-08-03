@@ -8,7 +8,6 @@ use Symfony\Component\BrowserKit\HttpBrowser;
 use Symfony\Component\HttpFoundation\Request;
 
 #[Memoizable]
-#[Memoize]
 final readonly class TimeSiteHandler implements SiteHandler
 {
     public function __construct(
@@ -26,6 +25,7 @@ final readonly class TimeSiteHandler implements SiteHandler
         return $host === 'time.com';
     }
 
+    #[Memoize]
     public function getContent(string $url): string
     {
         $crawler = $this->browser->request(Request::METHOD_GET, $url);
