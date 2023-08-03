@@ -14,6 +14,7 @@ parameters:
         - world@lemmy.world
         - globalpolitics@lemmy.world
         - fediverse@lemmy.world
+        - dfw@lemmy.world
 
 services:
     # default configuration for services in *this* file
