@@ -11,6 +11,8 @@ parameters:
     instance.whitelist: []
     community.whitelist:
         - technology@lemmy.world
+        - world@lemmy.world
+        - globalpolitics@lemmy.world
 
 services:
     # default configuration for services in *this* file
