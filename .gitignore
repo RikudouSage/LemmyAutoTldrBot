@@ -3,6 +3,7 @@
 /memoized
 /.idea
 /.serverless
+/node_modules
 
 ###> symfony/framework-bundle ###
 /.env.local

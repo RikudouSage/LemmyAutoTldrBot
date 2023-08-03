@@ -33,8 +33,12 @@ provider:
     LEMMY_PASSWORD: ${env:LEMMY_PASSWORD}
     LEMMY_USER: ${env:LEMMY_USER}
 
+plugins:
+  - serverless-plugin-log-retention
+
 custom:
   TypeIndexName: type-index
+  logRetentionInDays: 90
 
 functions:
   cronPosts:

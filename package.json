@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "serverless-plugin-log-retention": "^2.0.0"
+  }
+}
