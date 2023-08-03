@@ -1,0 +1,2 @@
+rikudou_memoize:
+  cache_service: rikudou.dynamo_cache.adapter

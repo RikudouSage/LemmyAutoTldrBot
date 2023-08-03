@@ -33,14 +33,16 @@ final class ManualRunCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $io = new SymfonyStyle($input, $output);
+
         $url = $input->getArgument('url');
         $content = $this->siteHandler->getContent($url);
         if (!$content) {
+            $io->error('Failed getting content');
+
             return self::FAILURE;
         }
         $summary = $this->summaryProvider->getSummary($content, 5);
-
-        $io = new SymfonyStyle($input, $output);
 
         $io->success($summary);
 
