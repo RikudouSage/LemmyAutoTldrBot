@@ -4,7 +4,6 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib
 
 ARG PHP_VERSION=8.2.8
 ARG PYTHON_VERSION=3.9.17
-ARG OPENSSL_VERSION=1.1.1v
 SHELL ["/bin/bash", "-c"]
 
 RUN yum clean all && \
