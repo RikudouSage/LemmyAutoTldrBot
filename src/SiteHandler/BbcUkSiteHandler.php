@@ -4,37 +4,18 @@ namespace App\SiteHandler;
 
 use Rikudou\MemoizeBundle\Attribute\Memoizable;
 use Rikudou\MemoizeBundle\Attribute\Memoize;
-use Symfony\Component\BrowserKit\HttpBrowser;
-use Symfony\Component\HttpFoundation\Request;
 
 #[Memoizable]
 #[Memoize]
-final readonly class BbcUkSiteHandler implements SiteHandler
+final readonly class BbcUkSiteHandler extends AbstractSiteHandler
 {
-    public function __construct(
-        private HttpBrowser $browser,
-    ) {
+    protected function getHostnames(): array
+    {
+        return ['www.bbc.co.uk'];
     }
 
-    public function supports(string $url): bool
+    protected function getSelector(): string
     {
-        $host = parse_url($url, PHP_URL_HOST);
-        if (!$host) {
-            return false;
-        }
-
-        return $host === 'www.bbc.co.uk';
-    }
-
-    public function getContent(string $url): string
-    {
-        $crawler = $this->browser->request(Request::METHOD_GET, $url);
-        $parts = $crawler->filter('section.body-content');
-        $content = '';
-        foreach ($parts as $part) {
-            $content .= $part->nodeValue . "\n\n";
-        }
-
-        return trim($content);
+        return 'section.body-content';
     }
 }
