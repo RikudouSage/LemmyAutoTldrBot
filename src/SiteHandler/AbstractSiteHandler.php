@@ -35,7 +35,9 @@ abstract readonly class AbstractSiteHandler implements SiteHandler
 
     public function getContent(string $url): string
     {
-        $crawler = $this->browser->request(Request::METHOD_GET, $url);
+        $crawler = $this->browser->request(Request::METHOD_GET, $url, server: [
+            'HTTP_USER_AGENT' => $this->getUserAgent(),
+        ]);
         $parts = $crawler->filter($this->getSelector());
         $content = '';
 
@@ -57,5 +59,10 @@ abstract readonly class AbstractSiteHandler implements SiteHandler
     protected function ignoreLast(): int
     {
         return 0;
+    }
+
+    protected function getUserAgent(): string
+    {
+        return 'LemmyAutoTldrBot';
     }
 }
