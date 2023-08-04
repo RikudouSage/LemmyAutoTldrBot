@@ -150,7 +150,7 @@ final class GetStatsCommand extends Command
                     $comments,
                     $upvotes,
                     $downvotes,
-                    number_format($upvotes / ($downvotes + $upvotes) * 100, 2) . '%',
+                    $upvotes !== 0 || $downvotes !== 0 ? number_format($upvotes / ($downvotes + $upvotes) * 100, 2) . '%' : 'N/A',
                     number_format($upvotes / $comments, 2),
                 ],
                 array_keys($perInstanceUpvotes),
