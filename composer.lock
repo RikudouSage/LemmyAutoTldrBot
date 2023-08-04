@@ -739,16 +739,16 @@
         },
         {
             "name": "rikudou/lemmy-api",
-            "version": "v0.2.1",
+            "version": "v0.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RikudouSage/LemmyApi.git",
-                "reference": "61449bcdcf2094fb2383aff25e162bccb94eaad8"
+                "reference": "82cdec02a0d5cd3b8025ed46b5e4f773bb1047e2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RikudouSage/LemmyApi/zipball/61449bcdcf2094fb2383aff25e162bccb94eaad8",
-                "reference": "61449bcdcf2094fb2383aff25e162bccb94eaad8",
+                "url": "https://api.github.com/repos/RikudouSage/LemmyApi/zipball/82cdec02a0d5cd3b8025ed46b5e4f773bb1047e2",
+                "reference": "82cdec02a0d5cd3b8025ed46b5e4f773bb1047e2",
                 "shasum": ""
             },
             "require": {
@@ -781,9 +781,9 @@
             "description": "Communicate with Lemmy API from php",
             "support": {
                 "issues": "https://github.com/RikudouSage/LemmyApi/issues",
-                "source": "https://github.com/RikudouSage/LemmyApi/tree/v0.2.1"
+                "source": "https://github.com/RikudouSage/LemmyApi/tree/v0.2.3"
             },
-            "time": "2023-07-31T15:15:39+00:00"
+            "time": "2023-08-04T19:46:53+00:00"
         },
         {
             "name": "rikudou/memoize-bundle",
@@ -2071,16 +2071,16 @@
         },
         {
             "name": "symfony/flex",
-            "version": "v2.3.1",
+            "version": "v2.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/flex.git",
-                "reference": "3c9c3424efdafe33e0e3cfb5e87e50b34711fedf"
+                "reference": "9c402af768c6c9f8126a9ffa192ecf7c16581e35"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/flex/zipball/3c9c3424efdafe33e0e3cfb5e87e50b34711fedf",
-                "reference": "3c9c3424efdafe33e0e3cfb5e87e50b34711fedf",
+                "url": "https://api.github.com/repos/symfony/flex/zipball/9c402af768c6c9f8126a9ffa192ecf7c16581e35",
+                "reference": "9c402af768c6c9f8126a9ffa192ecf7c16581e35",
                 "shasum": ""
             },
             "require": {
@@ -2116,7 +2116,7 @@
             "description": "Composer plugin for Symfony",
             "support": {
                 "issues": "https://github.com/symfony/flex/issues",
-                "source": "https://github.com/symfony/flex/tree/v2.3.1"
+                "source": "https://github.com/symfony/flex/tree/v2.3.3"
             },
             "funding": [
                 {
@@ -2132,7 +2132,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-05-27T07:38:25+00:00"
+            "time": "2023-08-04T09:02:35+00:00"
         },
         {
             "name": "symfony/framework-bundle",
