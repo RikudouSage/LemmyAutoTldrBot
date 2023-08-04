@@ -8,6 +8,7 @@ parameters:
     lemmy.instance: lemmings.world
     instance.blacklist:
         - lemmy.world
+        - beehaw.org
     community.blacklist: []
     instance.whitelist: []
     community.whitelist:
