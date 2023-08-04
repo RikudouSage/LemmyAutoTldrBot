@@ -58,8 +58,10 @@ final class GetStatsCommand extends Command
         $positiveCount = 0;
         $negativeCount = 0;
 
-        /** @var array<string, int> $communities */
         $communities = [];
+        $perInstanceUpvotes = [];
+        $perInstanceDownvotes = [];
+        $perInstanceComments = [];
 
         $me = $this->api->site()->getSite()->myUser?->localUserView->person ?? throw new RuntimeException('Failed to get current user');
 
@@ -74,6 +76,15 @@ final class GetStatsCommand extends Command
             } else {
                 ++$neutralCount;
             }
+
+            $instance = parse_url($comment->community->actorId, PHP_URL_HOST);
+
+            $perInstanceUpvotes[$instance] ??= 0;
+            $perInstanceDownvotes[$instance] ??= 0;
+            $perInstanceComments[$instance] ??= 0;
+            $perInstanceUpvotes[$instance] += $comment->counts->upvotes - 1;
+            $perInstanceDownvotes[$instance] += $comment->counts->downvotes;
+            $perInstanceComments[$instance] += 1;
 
             $communities[$comment->community->actorId] ??= 0;
             $communities[$comment->community->actorId] += 1;
@@ -129,6 +140,24 @@ final class GetStatsCommand extends Command
         $io->table(
             ['Mentions', 'Responded', "Didn't respond"],
             [[$mentionsResponded + $mentionsUnresponded, $mentionsResponded, $mentionsUnresponded]],
+        );
+
+        $io->table(
+            ['Instance', 'Comments', 'Upvotes', 'Downvotes', 'Like ratio', 'Upvotes per comment'],
+            array_map(
+                static fn (string $instance, int $upvotes, int $downvotes, int $comments) => [ // @phpstan-ignore-line
+                    $instance,
+                    $comments,
+                    $upvotes,
+                    $downvotes,
+                    number_format($upvotes / ($downvotes + $upvotes) * 100, 2) . '%',
+                    number_format($upvotes / $comments, 2),
+                ],
+                array_keys($perInstanceUpvotes),
+                $perInstanceUpvotes,
+                $perInstanceDownvotes,
+                $perInstanceComments,
+            )
         );
 
         $io->table(
