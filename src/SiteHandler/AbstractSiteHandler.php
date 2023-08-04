@@ -2,6 +2,7 @@
 
 namespace App\SiteHandler;
 
+use DOMNode;
 use Rikudou\MemoizeBundle\Attribute\Memoizable;
 use Rikudou\MemoizeBundle\Attribute\Memoize;
 use Symfony\Component\BrowserKit\HttpBrowser;
@@ -46,9 +47,13 @@ abstract readonly class AbstractSiteHandler implements SiteHandler
         $ignoreLast = $this->ignoreLast();
 
         $regex = $this->skipIfMatches();
+        $breakCallable = $this->breakIf() ?? static fn (DOMNode $node) => false;
 
         foreach ($parts as $part) {
             if ($i === $count - $ignoreLast) {
+                break;
+            }
+            if ($breakCallable($part)) {
                 break;
             }
             ++$i;
@@ -72,6 +77,14 @@ abstract readonly class AbstractSiteHandler implements SiteHandler
     }
 
     protected function skipIfMatches(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * @return (callable(DOMNode $node): bool)|null
+     */
+    protected function breakIf(): ?callable
     {
         return null;
     }
