@@ -3,7 +3,7 @@
 namespace App\Command;
 
 use App\Exception\ContentFetchingFailedException;
-use App\Service\CommentLinkHandler;
+use App\Service\LinkResolver;
 use App\Service\PermissionChecker;
 use App\Service\SiteHandlerCollection;
 use App\Service\SummaryTextWrapper;
@@ -13,6 +13,7 @@ use Rikudou\LemmyApi\Enum\Language;
 use Rikudou\LemmyApi\Enum\ListingType;
 use Rikudou\LemmyApi\Exception\LanguageNotAllowedException;
 use Rikudou\LemmyApi\LemmyApi;
+use Rikudou\LemmyApi\Response\Model\Comment;
 use Rikudou\LemmyApi\Response\Model\Post;
 use Rikudou\LemmyApi\Response\View\CommentView;
 use Rikudou\LemmyApi\Response\View\PersonMentionView;
@@ -32,7 +33,7 @@ final class ReplyToMentionsCommand extends Command
         private readonly SummaryProvider $summaryProvider,
         private readonly int $summaryParagraphs,
         private readonly SummaryTextWrapper $summaryTextWrapper,
-        private readonly CommentLinkHandler $commentLinkHandler,
+        private readonly LinkResolver $linkResolver,
     ) {
         parent::__construct();
     }
@@ -45,37 +46,18 @@ final class ReplyToMentionsCommand extends Command
 
         foreach ($this->getUnreadMentions() as $unreadMention) {
             try {
+                $hasPermissionToPost = $this->permissionChecker->canPostToCommunity($unreadMention->community);
                 $mentionerInstance = parse_url($unreadMention->creator->actorId, PHP_URL_HOST);
                 assert(is_string($mentionerInstance));
 
-                if (!$this->permissionChecker->canPostToCommunity($unreadMention->community)) {
-                    $communityInstance = parse_url($unreadMention->community->actorId, PHP_URL_HOST);
-                    $this->api->currentUser()->sendPrivateMessage(
-                        recipient: $unreadMention->creator,
-                        content: "Hi there! I see you mentioned me in a post in !{$unreadMention->community->name}@{$communityInstance} but I'm afraid I'm not allowed to participate in that community.\n\nIf you feel I would be helpful, contact the mods of the community and let them know!",
-                    );
-                    continue;
-                }
                 $me = $unreadMention->recipient;
                 $post = $unreadMention->post;
                 if (!$post->url) {
-                    $response = "I'm sorry, I don't see any link in the post, I'm not sure what I should summarize.";
-
-                    try {
-                        $this->api->comment()->create(
-                            post: $unreadMention->post,
-                            content: $response,
-                            language: Language::English,
-                            parent: $unreadMention->comment,
-                        );
-                    } catch (LanguageNotAllowedException) {
-                        $this->api->comment()->create(
-                            post: $unreadMention->post,
-                            content: $response,
-                            language: Language::Undetermined,
-                            parent: $unreadMention->comment,
-                        );
-                    }
+                    $this->sendReply(
+                        "I'm sorry, I don't see any link in the post, I'm not sure what I should summarize.",
+                        $unreadMention,
+                        $unreadMention->comment,
+                    );
                     continue;
                 }
 
@@ -88,6 +70,11 @@ final class ReplyToMentionsCommand extends Command
                     if (!count($topCommentsByMe)) {
                         $articleContent = $this->siteHandler->getContent($url);
                         $summary = $this->summaryProvider->getSummary($articleContent, $this->summaryParagraphs);
+
+                        if (!$hasPermissionToPost) {
+                            $this->sendReply(implode("\n\n", $summary), $unreadMention);
+                            continue;
+                        }
 
                         try {
                             $summaryComment = $this->api->comment()->create(
@@ -107,43 +94,20 @@ final class ReplyToMentionsCommand extends Command
                         $summaryComment = $topCommentsByMe[array_key_first($topCommentsByMe)];
                         $response = 'I already created the summary. ';
                     }
-                    $summaryCommentLink = $this->commentLinkHandler->getCommentLink($summaryComment->comment, $mentionerInstance, $error);
+                    $summaryCommentLink = $this->linkResolver->getCommentLink($summaryComment->comment, $mentionerInstance, $error);
                     $response .= "You can find it at {$summaryCommentLink}.";
                     if ($error) {
                         $response .= " (I tried to create the link for your instance but I failed miserably, for which I'm very sorry).";
                     }
 
-                    try {
-                        $this->api->comment()->create(
-                            post: $unreadMention->post,
-                            content: $response,
-                            language: Language::English,
-                            parent: $unreadMention->comment,
-                        );
-                    } catch (LanguageNotAllowedException) {
-                        $this->api->comment()->create(
-                            post: $unreadMention->post,
-                            content: $response,
-                            language: Language::Undetermined,
-                            parent: $unreadMention->comment,
-                        );
-                    }
+                    $this->sendReply($response, $unreadMention, $unreadMention->comment);
                 } catch (ContentFetchingFailedException) {
                     $response = "I'm sorry, I don't know how to handle links for that site. You may contact my maintainer, [@{$maintainerName}@{$maintainerInstance}](/u/{$maintainerName}@{$maintainerInstance}), if you wish to add it to supported sites!";
-
-                    try {
-                        $this->api->comment()->create(
-                            post: $unreadMention->post,
-                            content: $response,
-                            language: Language::English,
-                            parent: $unreadMention->comment,
-                        );
-                    } catch (LanguageNotAllowedException) {
-                        $this->api->comment()->create(
-                            post: $unreadMention->post,
-                            content: $response,
-                            language: Language::Undetermined,
-                            parent: $unreadMention->comment,
+                    $this->sendReply($response, $unreadMention, $unreadMention->comment);
+                    if (!$hasPermissionToPost) {
+                        $this->api->currentUser()->sendPrivateMessage(
+                            recipient: $maintainer,
+                            content: "@{$me->name} bot got called for a site it can't handle: {$this->linkResolver->getPostLink($unreadMention->post)}",
                         );
                     }
                     continue;
@@ -191,5 +155,41 @@ final class ReplyToMentionsCommand extends Command
             $alreadySent = array_merge($alreadySent, array_map(static fn (CommentView $comment) => $comment->comment->id, $comments));
             ++$page;
         } while (count($comments));
+    }
+
+    private function sendReply(string $reply, PersonMentionView $mention, ?Comment $parent = null): void
+    {
+        $hasPermission = $this->permissionChecker->canPostToCommunity($mention->community);
+        $text = '';
+        if (!$hasPermission) {
+            $text .= "I'm replying to the mention at {$this->linkResolver->getPostLink($mention->post)} in private, because I've been forbidden from replying in comments:\n\n---\n\n";
+        }
+        $text .= $reply;
+        if (!$hasPermission) {
+            $text .= "\n\n---\n\nIf you believe this bot is useful, please contact the mods of your favorite community and let them know!";
+        }
+
+        if ($hasPermission) {
+            try {
+                $this->api->comment()->create(
+                    post: $mention->post,
+                    content: $text,
+                    language: Language::English,
+                    parent: $parent,
+                );
+            } catch (LanguageNotAllowedException) {
+                $this->api->comment()->create(
+                    post: $mention->post,
+                    content: $text,
+                    language: Language::Undetermined,
+                    parent: $parent,
+                );
+            }
+        } else {
+            $this->api->currentUser()->sendPrivateMessage(
+                recipient: $mention->creator,
+                content: $text,
+            );
+        }
     }
 }
