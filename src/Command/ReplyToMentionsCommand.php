@@ -159,10 +159,11 @@ final class ReplyToMentionsCommand extends Command
 
     private function sendReply(string $reply, PersonMentionView $mention, ?Comment $parent = null): void
     {
+        $mentionerInstance = parse_url($mention->creator->actorId, PHP_URL_HOST) ?: null;
         $hasPermission = $this->permissionChecker->canPostToCommunity($mention->community);
         $text = '';
         if (!$hasPermission) {
-            $text .= "I'm replying to the mention at {$this->linkResolver->getPostLink($mention->post)} in private, because I've been forbidden from replying in comments:\n\n---\n\n";
+            $text .= "I'm replying to the mention at {$this->linkResolver->getPostLink($mention->post, $mentionerInstance)} in private, because I've been forbidden from replying in comments:\n\n---\n\n";
         }
         $text .= $reply;
         if (!$hasPermission) {
