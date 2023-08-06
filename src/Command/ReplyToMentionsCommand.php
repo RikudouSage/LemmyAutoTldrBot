@@ -69,6 +69,14 @@ final class ReplyToMentionsCommand extends Command
 
                     if (!count($topCommentsByMe)) {
                         $articleContent = $this->siteHandler->getContent($url);
+                        if (!$articleContent) {
+                            $this->sendReply(
+                                "I'm sorry, I couldn't create a summary for the article.",
+                                $unreadMention,
+                                $unreadMention->comment,
+                            );
+                            continue;
+                        }
                         $summary = $this->summaryProvider->getSummary($articleContent, $this->summaryParagraphs);
 
                         if (!$hasPermissionToPost) {

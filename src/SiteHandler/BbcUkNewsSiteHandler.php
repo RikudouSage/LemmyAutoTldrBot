@@ -24,4 +24,13 @@ final readonly class BbcUkNewsSiteHandler extends AbstractSiteHandler
     {
         return '[data-component="text-block"]';
     }
+
+    public function getContent(string $url): string
+    {
+        if (str_ends_with($url, '.amp')) {
+            $url = substr($url, 0, -4);
+        }
+
+        return parent::getContent($url);
+    }
 }
