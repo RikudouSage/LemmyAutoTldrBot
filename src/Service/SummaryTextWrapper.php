@@ -2,18 +2,32 @@
 
 namespace App\Service;
 
+use App\SummaryTextWrapper\SummaryTextWrapperProvider;
+use Rikudou\LemmyApi\Response\Model\Community;
+use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+
 final readonly class SummaryTextWrapper
 {
+    /**
+     * @param iterable<SummaryTextWrapperProvider> $providers
+     */
     public function __construct(
-        private string $sourceCodeLink,
+        #[TaggedIterator('app.summary_wrapper')]
+        private iterable $providers,
     ) {
     }
 
     /**
      * @param array<string> $summary
      */
-    public function getResponseText(array $summary): string
+    public function getResponseText(Community $community, array $summary): ?string
     {
-        return "This is the best summary I could come up with:\n\n---\n\n" . implode("\n\n", $summary) . "\n\n---\n\nI'm a bot and I'm [open source]({$this->sourceCodeLink})!";
+        foreach ($this->providers as $provider) {
+            if ($provider->supports($community)) {
+                return $provider->getSummaryText($summary);
+            }
+        }
+
+        return null;
     }
 }

@@ -76,7 +76,10 @@ final class ReplyToPostsCommand extends Command
                     continue;
                 }
 
-                $response = $this->summaryTextWrapper->getResponseText($summary);
+                $response = $this->summaryTextWrapper->getResponseText($post->community, $summary);
+                if ($response === null) {
+                    continue;
+                }
 
                 try {
                     $this->api->comment()->create(

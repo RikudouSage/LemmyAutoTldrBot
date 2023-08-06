@@ -21,6 +21,10 @@ parameters:
         - coloradopolitics@lemmy.world
         - archaeology@lemmy.world
         - texas@lemmy.world
+    instance.condensed:
+        - beehaw.org
+        - lemmings.world
+    community.condensed: []
 
 services:
     # default configuration for services in *this* file
@@ -87,6 +91,11 @@ services:
             $maintainer: '%env(LEMMY_MAINTAINER)%'
             $summaryParagraphs: '%app.summary_paragraphs%'
 
-    App\Service\SummaryTextWrapper:
+    App\SummaryTextWrapper\DefaultSummaryTextWrapperProvider:
         arguments:
             $sourceCodeLink: '%env(SOURCE_CODE_LINK)%'
+
+    App\SummaryTextWrapper\CondensedSummaryTextWrapperProvider:
+        arguments:
+            $condensedCommunities: '%community.condensed%'
+            $condensedInstances: '%instance.condensed%'

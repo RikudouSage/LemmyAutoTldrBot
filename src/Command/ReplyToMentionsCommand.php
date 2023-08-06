@@ -76,16 +76,21 @@ final class ReplyToMentionsCommand extends Command
                             continue;
                         }
 
+                        $response = $this->summaryTextWrapper->getResponseText($unreadMention->community, $summary);
+                        if ($response === null) {
+                            continue;
+                        }
+
                         try {
                             $summaryComment = $this->api->comment()->create(
                                 post: $unreadMention->post,
-                                content: $this->summaryTextWrapper->getResponseText($summary),
+                                content: $response,
                                 language: Language::English,
                             );
                         } catch (LanguageNotAllowedException) {
                             $summaryComment = $this->api->comment()->create(
                                 post: $unreadMention->post,
-                                content: $this->summaryTextWrapper->getResponseText($summary),
+                                content: $response,
                                 language: Language::Undetermined,
                             );
                         }
