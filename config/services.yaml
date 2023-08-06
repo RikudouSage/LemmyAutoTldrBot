@@ -8,7 +8,6 @@ parameters:
     lemmy.instance: lemmings.world
     instance.blacklist:
         - lemmy.world
-        - beehaw.org
     community.blacklist: []
     instance.whitelist: []
     community.whitelist:
@@ -23,7 +22,6 @@ parameters:
         - texas@lemmy.world
     instance.condensed:
         - beehaw.org
-        - lemmings.world
     community.condensed: []
 
 services:
