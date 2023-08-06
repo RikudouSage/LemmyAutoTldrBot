@@ -47,17 +47,22 @@ abstract readonly class AbstractSiteHandler implements SiteHandler
         $ignoreLast = $this->ignoreLast();
 
         $regex = $this->skipIfMatches();
-        $breakCallable = $this->breakIf() ?? static fn (DOMNode $node) => false;
+        $breakCallable = $this->breakIf() ?? static fn () => false;
+        $skipCallable = $this->skipIf() ?? static fn () => false;
+        $context = [];
 
         foreach ($parts as $part) {
             if ($i === $count - $ignoreLast) {
                 break;
             }
-            if ($breakCallable($part)) {
+            if ($breakCallable($part, $context)) {
                 break;
             }
             ++$i;
             if ($regex && $part->nodeValue && preg_match($regex, $part->nodeValue)) {
+                continue;
+            }
+            if ($skipCallable($part, $context)) {
                 continue;
             }
             $content .= $part->nodeValue . "\n\n";
@@ -82,7 +87,15 @@ abstract readonly class AbstractSiteHandler implements SiteHandler
     }
 
     /**
-     * @return (callable(DOMNode $node): bool)|null
+     * @return (callable(DOMNode $node, array<string, mixed> $context): bool)|null
+     */
+    protected function skipIf(): ?callable
+    {
+        return null;
+    }
+
+    /**
+     * @return (callable(DOMNode $node, array<string, mixed> $context): bool)|null
      */
     protected function breakIf(): ?callable
     {
