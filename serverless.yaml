@@ -20,6 +20,8 @@ provider:
             - dynamodb:PutItem
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
+  stackTags:
+    BillingProject: LemmyAutoTldr
   ecr:
     images:
       auto_tldr:
