@@ -8,6 +8,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -28,6 +29,12 @@ final class ManualRunCommand extends Command
                 name: 'url',
                 mode: InputArgument::REQUIRED,
             )
+            ->addOption(
+                name: 'show-text',
+                shortcut: 't',
+                mode: InputOption::VALUE_NONE,
+                description: 'Show the whole text instead of summary',
+            )
         ;
     }
 
@@ -42,9 +49,13 @@ final class ManualRunCommand extends Command
 
             return self::FAILURE;
         }
-        $summary = $this->summaryProvider->getSummary($content, 5);
 
-        $io->success($summary);
+        if ($input->getOption('show-text')) {
+            $io->success($content);
+        } else {
+            $summary = $this->summaryProvider->getSummary($content, 5);
+            $io->success($summary);
+        }
 
         return self::SUCCESS;
     }
