@@ -4,7 +4,11 @@ namespace App\SiteHandler;
 
 use DOMElement;
 use DOMNode;
+use Rikudou\MemoizeBundle\Attribute\Memoizable;
+use Rikudou\MemoizeBundle\Attribute\Memoize;
 
+#[Memoizable]
+#[Memoize]
 final readonly class TexasTribuneSiteHandler extends AbstractSiteHandler
 {
     protected function getHostnames(): array
