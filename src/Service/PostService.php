@@ -37,6 +37,9 @@ final readonly class PostService
                 if ($post->post->published > new DateTimeImmutable()) {
                     continue;
                 }
+                if ($post->post->featuredLocal) {
+                    continue;
+                }
                 if ($post->post->id > $untilId && $i < $limit) {
                     yield $post;
                 } else {
