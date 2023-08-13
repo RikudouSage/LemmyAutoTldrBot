@@ -40,19 +40,27 @@ final class ReplyToMentionsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        error_log('Running command to reply to mentions');
+
         $maintainer = $this->api->user()->get($this->maintainer);
         $maintainerName = $maintainer->name;
         $maintainerInstance = parse_url($maintainer->actorId, PHP_URL_HOST);
 
+        $i = 1;
         foreach ($this->getUnreadMentions() as $unreadMention) {
+            error_log("Handling mention #{$i}");
+
             try {
                 $hasPermissionToPost = $this->permissionChecker->canPostToCommunity($unreadMention->community);
                 $mentionerInstance = parse_url($unreadMention->creator->actorId, PHP_URL_HOST);
                 assert(is_string($mentionerInstance));
 
+                error_log('Has permission to post: ' . ($hasPermissionToPost ? 'true' : 'false'));
+
                 $me = $unreadMention->recipient;
                 $post = $unreadMention->post;
                 if (!$post->url) {
+                    error_log('No URL');
                     $this->sendReply(
                         "I'm sorry, I don't see any link in the post, I'm not sure what I should summarize.",
                         $unreadMention,
@@ -68,8 +76,10 @@ final class ReplyToMentionsCommand extends Command
                     $topCommentsByMe = array_filter($topComments, static fn (CommentView $comment) => $comment->creator->id === $me->id);
 
                     if (!count($topCommentsByMe)) {
+                        error_log('Creating summary');
                         $articleContent = $this->siteHandler->getContent($url);
                         if (!$articleContent) {
+                            error_log('No content from article');
                             $this->sendReply(
                                 "I'm sorry, I couldn't create a summary for the article.",
                                 $unreadMention,
@@ -104,6 +114,7 @@ final class ReplyToMentionsCommand extends Command
                         }
                         $response = 'I just created the summary! ';
                     } else {
+                        error_log('Summary already posted');
                         $summaryComment = $topCommentsByMe[array_key_first($topCommentsByMe)];
                         $response = 'I already created the summary. ';
                     }
@@ -115,6 +126,8 @@ final class ReplyToMentionsCommand extends Command
 
                     $this->sendReply($response, $unreadMention, $unreadMention->comment);
                 } catch (ContentFetchingFailedException) {
+                    error_log('Unsupported site');
+
                     $response = "I'm sorry, I don't know how to handle links for that site. You may contact my maintainer, [@{$maintainerName}@{$maintainerInstance}](/u/{$maintainerName}@{$maintainerInstance}), if you wish to add it to supported sites!";
                     $this->sendReply($response, $unreadMention, $unreadMention->comment);
                     if (!$hasPermissionToPost) {
@@ -126,6 +139,8 @@ final class ReplyToMentionsCommand extends Command
                     continue;
                 }
             } finally {
+                error_log("Handling mention #{$i} done.");
+                ++$i;
                 $this->api->currentUser()->markMentionAsRead($unreadMention->personMention);
             }
         }
