@@ -97,3 +97,8 @@ services:
         arguments:
             $condensedCommunities: '%community.condensed%'
             $condensedInstances: '%instance.condensed%'
+
+    App\Enum\BotMode:
+        factory: [App\Enum\BotMode, from]
+        arguments:
+            - '%env(BOT_MODE)%'

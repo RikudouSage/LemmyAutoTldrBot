@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Enum\BotMode;
 use Rikudou\LemmyApi\Response\Model\Community;
 use RuntimeException;
 
@@ -18,6 +19,7 @@ final readonly class HardcodedPermissionChecker implements PermissionChecker
         private array $instanceWhitelist,
         private array $communityBlacklist,
         private array $communityWhitelist,
+        private BotMode $botMode,
     ) {
     }
 
@@ -39,7 +41,7 @@ final readonly class HardcodedPermissionChecker implements PermissionChecker
             return false;
         }
 
-        return true;
+        return $this->botMode === BotMode::All;
     }
 
     private function getInstance(Community $community): string
