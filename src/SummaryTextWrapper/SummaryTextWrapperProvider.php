@@ -13,5 +13,5 @@ interface SummaryTextWrapperProvider
     /**
      * @param array<string> $summary
      */
-    public function getSummaryText(array $summary): string;
+    public function getSummaryText(array $summary, string $originalText): string;
 }

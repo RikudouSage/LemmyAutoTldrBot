@@ -8,6 +8,7 @@
         "ext-ctype": "*",
         "ext-dom": "*",
         "ext-iconv": "*",
+        "ext-intl": "*",
         "nyholm/psr7": "^1.8",
         "rikudou/lemmy-api": "^0.2.1",
         "rikudou/memoize-bundle": "^1.0",

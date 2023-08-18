@@ -94,7 +94,7 @@ final class ReplyToMentionsCommand extends Command
                             continue;
                         }
 
-                        $response = $this->summaryTextWrapper->getResponseText($unreadMention->community, $summary);
+                        $response = $this->summaryTextWrapper->getResponseText($unreadMention->community, $summary, $articleContent);
                         if ($response === null) {
                             continue;
                         }

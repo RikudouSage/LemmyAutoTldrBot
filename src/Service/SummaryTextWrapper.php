@@ -20,11 +20,11 @@ final readonly class SummaryTextWrapper
     /**
      * @param array<string> $summary
      */
-    public function getResponseText(Community $community, array $summary): ?string
+    public function getResponseText(Community $community, array $summary, string $originalText): ?string
     {
         foreach ($this->providers as $provider) {
             if ($provider->supports($community)) {
-                return $provider->getSummaryText($summary);
+                return $provider->getSummaryText($summary, $originalText);
             }
         }
 

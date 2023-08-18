@@ -85,7 +85,7 @@ final class ReplyToPostsCommand extends Command
                     continue;
                 }
 
-                $response = $this->summaryTextWrapper->getResponseText($post->community, $summary);
+                $response = $this->summaryTextWrapper->getResponseText($post->community, $summary, $text);
                 if ($response === null) {
                     error_log('Failed generating wrapped summary, skipping');
                     continue;

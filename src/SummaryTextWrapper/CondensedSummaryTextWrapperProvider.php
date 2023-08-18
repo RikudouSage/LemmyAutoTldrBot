@@ -2,6 +2,7 @@
 
 namespace App\SummaryTextWrapper;
 
+use App\Service\RatioFormatter;
 use Rikudou\LemmyApi\Response\Model\Community;
 
 final readonly class CondensedSummaryTextWrapperProvider implements SummaryTextWrapperProvider
@@ -13,6 +14,7 @@ final readonly class CondensedSummaryTextWrapperProvider implements SummaryTextW
     public function __construct(
         private array $condensedInstances,
         private array $condensedCommunities,
+        private RatioFormatter $ratioFormatter,
     ) {
     }
 
@@ -25,14 +27,20 @@ final readonly class CondensedSummaryTextWrapperProvider implements SummaryTextW
             || in_array($instance, $this->condensedInstances, true);
     }
 
-    public function getSummaryText(array $summary): string
+    public function getSummaryText(array $summary, string $originalText): string
     {
         $stringSummary = implode("\n\n", $summary);
+
+        $stats = $this->ratioFormatter->getRatio($originalText, $stringSummary);
 
         return <<<CANT_THINK_OF_UNIQUE_DELIMITER
             🤖 I'm a bot that provides automatic summaries for articles:
             ::: spoiler Click here to see the summary
             {$stringSummary}
+            
+            ---
+            
+            Saved {$stats->ratioSaved} of original text.
             :::
             CANT_THINK_OF_UNIQUE_DELIMITER;
     }
