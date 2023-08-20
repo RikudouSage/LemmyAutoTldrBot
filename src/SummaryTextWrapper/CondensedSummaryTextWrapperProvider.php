@@ -40,7 +40,7 @@ final readonly class CondensedSummaryTextWrapperProvider implements SummaryTextW
             
             ---
             
-            Saved {$stats->ratioSaved} of original text.
+            Saved {$stats->formattedRatioSaved} of original text.
             :::
             CANT_THINK_OF_UNIQUE_DELIMITER;
     }
