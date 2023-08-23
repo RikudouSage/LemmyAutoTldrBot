@@ -57,6 +57,8 @@ final class GetStatsCommand extends Command
         $neutralCount = 0;
         $positiveCount = 0;
         $negativeCount = 0;
+        $goodBots = 0;
+        $badBots = 0;
 
         $communities = [];
         $perInstanceUpvotes = [];
@@ -76,6 +78,8 @@ final class GetStatsCommand extends Command
             } else {
                 ++$neutralCount;
             }
+            $goodBots += $this->getGoodBots($comment);
+            $badBots += $this->getBadBots($comment);
 
             $instance = parse_url($comment->community->actorId, PHP_URL_HOST);
 
@@ -104,8 +108,10 @@ final class GetStatsCommand extends Command
             'Negative comments count',
             'Positive comments count',
             'Neutral comments count',
+            'Good bots',
+            'Bad bots',
         ], [
-            [$commentCount, $upvotes, $downvotes, $negativeCount, $positiveCount, $neutralCount],
+            [$commentCount, $upvotes, $downvotes, $negativeCount, $positiveCount, $neutralCount, $goodBots, $badBots],
         ]);
 
         $sentMessageCount = 0;
@@ -216,8 +222,8 @@ final class GetStatsCommand extends Command
                 }
 
                 yield $message;
-                ++$page;
             }
+            ++$page;
         } while (count($messages));
     }
 
@@ -239,8 +245,56 @@ final class GetStatsCommand extends Command
                 }
 
                 yield $mention;
-                ++$page;
             }
+            ++$page;
         } while (count($mentions));
+    }
+
+    private function getGoodBots(CommentView $parent): int
+    {
+        $page = 1;
+
+        $handled = [];
+
+        $result = 0;
+        do {
+            $comments = $this->api->comment()->getComments(page: 1, parent: $parent->comment);
+            $comments = array_filter($comments, fn (CommentView $comment) => $comment->comment->id !== $parent->comment->id);
+            $comments = array_filter($comments, fn (CommentView $comment) => !in_array($comment->comment->id, $handled, true));
+            foreach ($comments as $comment) {
+                assert($comment instanceof CommentView);
+                $handled[] = $comment->comment->id;
+                if (str_contains(mb_strtolower($comment->comment->content), 'good bot')) {
+                    ++$result;
+                }
+            }
+            ++$page;
+        } while (count($comments));
+
+        return $result;
+    }
+
+    private function getBadBots(CommentView $parent): int
+    {
+        $page = 1;
+
+        $handled = [];
+
+        $result = 0;
+        do {
+            $comments = $this->api->comment()->getComments(page: 1, parent: $parent->comment);
+            $comments = array_filter($comments, fn (CommentView $comment) => $comment->comment->id !== $parent->comment->id);
+            $comments = array_filter($comments, fn (CommentView $comment) => !in_array($comment->comment->id, $handled, true));
+            foreach ($comments as $comment) {
+                assert($comment instanceof CommentView);
+                $handled[] = $comment->comment->id;
+                if (str_contains(mb_strtolower($comment->comment->content), 'bad bot')) {
+                    ++$result;
+                }
+            }
+            ++$page;
+        } while (count($comments));
+
+        return $result;
     }
 }
