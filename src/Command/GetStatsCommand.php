@@ -4,6 +4,7 @@ namespace App\Command;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use Rikudou\LemmyApi\Enum\CommentSortType;
 use Rikudou\LemmyApi\Enum\SortType;
 use Rikudou\LemmyApi\LemmyApi;
 use Rikudou\LemmyApi\Response\View\CommentView;
@@ -65,9 +66,23 @@ final class GetStatsCommand extends Command
         $perInstanceDownvotes = [];
         $perInstanceComments = [];
 
-        $me = $this->api->site()->getSite()->myUser?->localUserView->person ?? throw new RuntimeException('Failed to get current user');
+        $localUser = $this->api->site()->getSite()->myUser?->localUserView ?? throw new RuntimeException('Failed to get current user');
+        $me = $localUser->person;
 
+        $progressBar = $io->createProgressBar();
+        $progressBar->setMessage('Initializing...');
+        if ($dateArgument === 'all') {
+            $progressBar->setMaxSteps($localUser->counts->commentCount);
+            $progressBar->setFormat('[%bar%] [%current%/%max%] - %message% (running %elapsed% of ~%estimated%)');
+        } else {
+            $progressBar->setFormat('[%bar%] [%current%] - %message% (running %elapsed%)');
+        }
+
+        $progressBar->start();
         foreach ($this->getComments($startDate, $endDate) as $comment) {
+            $progressBar->setMessage("Processing comment from {$comment->comment->published->format('c')}");
+            $progressBar->advance();
+
             ++$commentCount;
             $upvotes += $comment->counts->upvotes - 1;
             $downvotes += $comment->counts->downvotes;
@@ -185,6 +200,7 @@ final class GetStatsCommand extends Command
         do {
             $comments = $this->api->user()->getComments(
                 user: $me,
+                limit: 50,
                 page: $page,
                 sort: SortType::New,
             );
@@ -258,9 +274,9 @@ final class GetStatsCommand extends Command
 
         $result = 0;
         do {
-            $comments = $this->api->comment()->getComments(page: 1, parent: $parent->comment);
-            $comments = array_filter($comments, fn (CommentView $comment) => $comment->comment->id !== $parent->comment->id);
-            $comments = array_filter($comments, fn (CommentView $comment) => !in_array($comment->comment->id, $handled, true));
+            $comments = $this->api->comment()->getComments(page: 1, parent: $parent->comment, sortType: CommentSortType::New);
+            $comments = array_filter($comments, static fn (CommentView $comment) => $comment->comment->id !== $parent->comment->id);
+            $comments = array_filter($comments, static fn (CommentView $comment) => !in_array($comment->comment->id, $handled, true));
             foreach ($comments as $comment) {
                 assert($comment instanceof CommentView);
                 $handled[] = $comment->comment->id;
@@ -283,8 +299,8 @@ final class GetStatsCommand extends Command
         $result = 0;
         do {
             $comments = $this->api->comment()->getComments(page: 1, parent: $parent->comment);
-            $comments = array_filter($comments, fn (CommentView $comment) => $comment->comment->id !== $parent->comment->id);
-            $comments = array_filter($comments, fn (CommentView $comment) => !in_array($comment->comment->id, $handled, true));
+            $comments = array_filter($comments, static fn (CommentView $comment) => $comment->comment->id !== $parent->comment->id);
+            $comments = array_filter($comments, static fn (CommentView $comment) => !in_array($comment->comment->id, $handled, true));
             foreach ($comments as $comment) {
                 assert($comment instanceof CommentView);
                 $handled[] = $comment->comment->id;
