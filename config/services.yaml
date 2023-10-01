@@ -20,6 +20,7 @@ parameters:
         - coloradopolitics@lemmy.world
         - archaeology@lemmy.world
         - texas@lemmy.world
+        - gaybros@lemmy.world
     instance.condensed:
         - beehaw.org
     community.condensed: []
