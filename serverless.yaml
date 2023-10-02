@@ -34,6 +34,7 @@ provider:
     DYNAMODB_WHITELIST_BLACKLIST_TABLE_TYPE_INDEX: ${self:custom.TypeIndexName}
     LEMMY_PASSWORD: ${env:LEMMY_PASSWORD}
     LEMMY_USER: ${env:LEMMY_USER}
+    SUPPORT_COMMUNITY: autotldr@lemmings.world
 
 plugins:
   - serverless-plugin-log-retention

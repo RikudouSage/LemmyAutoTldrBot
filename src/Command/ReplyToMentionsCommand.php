@@ -34,6 +34,7 @@ final class ReplyToMentionsCommand extends Command
         private readonly int $summaryParagraphs,
         private readonly SummaryTextWrapper $summaryTextWrapper,
         private readonly LinkResolver $linkResolver,
+        private readonly string $supportCommunity,
     ) {
         parent::__construct();
     }
@@ -128,7 +129,11 @@ final class ReplyToMentionsCommand extends Command
                 } catch (ContentFetchingFailedException) {
                     error_log('Unsupported site');
 
-                    $response = "I'm sorry, I don't know how to handle links for that site. You may contact my maintainer, [@{$maintainerName}@{$maintainerInstance}](/u/{$maintainerName}@{$maintainerInstance}), if you wish to add it to supported sites!";
+                    $officialSupportCommunityText = '';
+                    if ($this->supportCommunity) {
+                        $officialSupportCommunityText = " or visit the official community at [!{$this->supportCommunity}](/c/{$this->supportCommunity})";
+                    }
+                    $response = "I'm sorry, I don't know how to handle links for that site. You may contact my maintainer, [@{$maintainerName}@{$maintainerInstance}](/u/{$maintainerName}@{$maintainerInstance}){$officialSupportCommunityText}, if you wish to add it to supported sites!";
                     $this->sendReply($response, $unreadMention, $unreadMention->comment);
                     if (!$hasPermissionToPost) {
                         $this->api->currentUser()->sendPrivateMessage(

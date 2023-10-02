@@ -6,6 +6,7 @@
 parameters:
     app.summary_paragraphs: 6
     lemmy.instance: lemmings.world
+    lemmy.support_community: '%env(SUPPORT_COMMUNITY)%'
     instance.blacklist:
         - lemmy.world
     community.blacklist: []
@@ -89,6 +90,7 @@ services:
         arguments:
             $maintainer: '%env(LEMMY_MAINTAINER)%'
             $summaryParagraphs: '%app.summary_paragraphs%'
+            $supportCommunity: '%lemmy.support_community%'
 
     App\SummaryTextWrapper\DefaultSummaryTextWrapperProvider:
         arguments:
