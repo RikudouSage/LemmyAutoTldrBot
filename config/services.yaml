@@ -26,6 +26,10 @@ parameters:
         - beehaw.org
     community.condensed: []
 
+    app.not_working:
+        - axios.com # doesn't work without JS
+        - mining.com # doesn't work without JS
+
 services:
     # default configuration for services in *this* file
     _defaults:

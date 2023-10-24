@@ -6,12 +6,15 @@ use DOMNode;
 use Rikudou\MemoizeBundle\Attribute\Memoizable;
 use Rikudou\MemoizeBundle\Attribute\Memoize;
 use Symfony\Component\BrowserKit\HttpBrowser;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[Memoizable]
 abstract readonly class AbstractSiteHandler implements SiteHandler
 {
     public function __construct(
+        protected HttpClientInterface $httpClient,
         protected HttpBrowser $browser,
     ) {
     }
@@ -36,9 +39,7 @@ abstract readonly class AbstractSiteHandler implements SiteHandler
     #[Memoize]
     public function getContent(string $url): string
     {
-        $crawler = $this->browser->request(Request::METHOD_GET, $url, server: [
-            'HTTP_USER_AGENT' => $this->getUserAgent(),
-        ]);
+        $crawler = $this->getArticleCrawler($url);
         $parts = $crawler->filter($this->getSelector());
         $content = '';
 
@@ -69,6 +70,13 @@ abstract readonly class AbstractSiteHandler implements SiteHandler
         }
 
         return trim($content);
+    }
+
+    protected function getArticleCrawler(string $url): Crawler
+    {
+        return $this->browser->request(Request::METHOD_GET, $url, server: [
+            'HTTP_USER_AGENT' => $this->getUserAgent(),
+        ]);
     }
 
     protected function ignoreLast(): int
