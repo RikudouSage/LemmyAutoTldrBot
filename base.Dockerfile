@@ -29,4 +29,3 @@ RUN curl -sL https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON
     make -j $(nproc) && \
     make altinstall && \
     cd .. && rm -rf Python-${PYTHON_VERSION}
-

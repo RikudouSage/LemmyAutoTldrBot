@@ -26,7 +26,7 @@ jobs:
           files_yaml: |
             base.Dockerfile
       - name: Wait on base build
-        if: steps.changed-changed_files.outputs.test_any_changed == 'true'
+        if: steps.changed_files.outputs.test_any_changed == 'true'
         uses: lewagon/wait-on-check-action@v1.3.1
         with:
           ref: ${{ github.ref }}
