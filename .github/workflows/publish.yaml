@@ -17,6 +17,20 @@ jobs:
       LEMMY_USER: ${{ secrets.LEMMY_USER }}
       AWS_REGION: eu-central-1
     steps:
+      - name: Get changed files
+        id: changed_files
+        uses: tj-actions/changed-files@v39
+        with:
+          files_yaml: |
+            base.Dockerfile
+      - name: Wait on base build
+        if: steps.changed-changed_files.outputs.test_any_changed == 'true'
+        uses: lewagon/wait-on-check-action@v1.3.1
+        with:
+          ref: ${{ github.ref }}
+          check-name: Push to registry
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 10
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
