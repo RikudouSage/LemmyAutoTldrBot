@@ -10,6 +10,7 @@ on:
 
 jobs:
   publish:
+    name: Publish docker
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
