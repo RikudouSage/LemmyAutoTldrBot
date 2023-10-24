@@ -17,6 +17,8 @@ jobs:
       LEMMY_USER: ${{ secrets.LEMMY_USER }}
       AWS_REGION: eu-central-1
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
       - name: Get changed files
         id: changed_files
         uses: tj-actions/changed-files@v39
@@ -35,8 +37,6 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.2
-      - name: Checkout code
-        uses: actions/checkout@v3
       - name: Install serverless
         run: |
           yarn global add serverless@3
