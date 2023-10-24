@@ -51,9 +51,14 @@ final class ReplyToPostsCommand extends Command
 
         $posts = $this->postService->getPosts($lastHandledId);
 
+        $handledThisRun = [];
+
         $i = 1;
         foreach ($posts as $post) {
             try {
+                if (isset($handledThisRun[$post->post->id])) {
+                    continue;
+                }
                 error_log("Handling post #{$i} (id: {$post->post->id})");
                 if ($post->post->id <= $storedLastHandledId) {
                     error_log('The post has lower ID than the from previous runs, not handling it');
@@ -98,6 +103,7 @@ final class ReplyToPostsCommand extends Command
                         language: Language::English
                     );
                     error_log("Replying to '{$this->instance}/post/{$post->post->id}' using model '{$this->summaryProvider->getId()}'");
+                    $handledThisRun[$post->post->id] = true;
                 } catch (LanguageNotAllowedException) {
                     $this->api->comment()->create(
                         post: $post->post,
@@ -105,6 +111,7 @@ final class ReplyToPostsCommand extends Command
                         language: Language::Undetermined
                     );
                     error_log("Replying to '{$this->instance}/post/{$post->post->id}' using model '{$this->summaryProvider->getId()}'");
+                    $handledThisRun[$post->post->id] = true;
                 }
             } catch (ContentFetchingFailedException|LanguageNotAllowedException) {
                 error_log('Got an exception, skipping');
