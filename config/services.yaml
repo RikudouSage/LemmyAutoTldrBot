@@ -9,7 +9,9 @@ parameters:
     lemmy.support_community: '%env(SUPPORT_COMMUNITY)%'
     instance.blacklist:
         - lemmy.world
-    community.blacklist: []
+    community.blacklist:
+        - forteana@feddit.uk
+        - britishfolktraditions@feddit.uk
     instance.whitelist: []
     community.whitelist:
         - technology@lemmy.world
