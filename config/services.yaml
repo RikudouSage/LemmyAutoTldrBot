@@ -26,6 +26,7 @@ parameters:
         - gaybros@lemmy.world
     instance.condensed:
         - beehaw.org
+        - lemmy.cafe
     community.condensed: []
 
     app.not_working:
