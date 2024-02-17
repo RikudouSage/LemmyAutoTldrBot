@@ -97,19 +97,21 @@ final class ReplyToPostsCommand extends Command
                 }
 
                 try {
-                    $this->api->comment()->create(
+                    $comment = $this->api->comment()->create(
                         post: $post->post,
                         content: $response,
                         language: Language::English
                     );
+                    $this->api->currentUser()->resetCommentUpvoteDownvote($comment->comment);
                     error_log("Replying to '{$this->instance}/post/{$post->post->id}' using model '{$this->summaryProvider->getId()}'");
                     $handledThisRun[$post->post->id] = true;
                 } catch (LanguageNotAllowedException) {
-                    $this->api->comment()->create(
+                    $comment = $this->api->comment()->create(
                         post: $post->post,
                         content: $response,
                         language: Language::Undetermined
                     );
+                    $this->api->currentUser()->resetCommentUpvoteDownvote($comment->comment);
                     error_log("Replying to '{$this->instance}/post/{$post->post->id}' using model '{$this->summaryProvider->getId()}'");
                     $handledThisRun[$post->post->id] = true;
                 }
