@@ -4,7 +4,7 @@ COPY . /var/task
 WORKDIR /var/task
 
 # Handle dependencies, build stuff
-RUN composer install --no-dev --no-scripts && \
+RUN COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --no-scripts && \
     APP_ENV=prod php bin/console cache:warmup && \
     cd python/source && \
     python3.9 -m venv venv && \
@@ -15,7 +15,7 @@ RUN composer install --no-dev --no-scripts && \
     rm -rf dist build && \
     cd .. && \
     python -m nltk.downloader punkt -d . && \
-    composer global clear-cache
+    COMPOSER_ALLOW_SUPERUSER=1 composer global clear-cache
 
 # Lambda
 RUN cp lambda/bootstrap.php /var/runtime/bootstrap && \
