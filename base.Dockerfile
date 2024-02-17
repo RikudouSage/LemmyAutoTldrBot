@@ -2,7 +2,7 @@ FROM public.ecr.aws/lambda/provided:al2
 
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib
 
-ARG PHP_VERSION=8.2.15
+ARG PHP_VERSION=8.2.16
 ARG PYTHON_VERSION=3.9.18
 SHELL ["/bin/bash", "-c"]
 
