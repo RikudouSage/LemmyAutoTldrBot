@@ -16,6 +16,6 @@ final readonly class AbcAustraliaSiteHandler extends AbstractSiteHandler
 
     protected function getSelector(): string
     {
-        return 'div[class*="Article_body"]  > div > div > p';
+        return 'div[class*="Article_body"] > div > p, div[class*="Article_body"] > div > ul:not([class*="ShareUtility"]) > li';
     }
 }
