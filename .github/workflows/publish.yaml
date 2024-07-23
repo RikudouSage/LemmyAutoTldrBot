@@ -42,6 +42,8 @@ jobs:
         run: |
           yarn global add serverless@3
           yarn install
+      - name: Get account ID
+        run: aws sts get-caller-identity --query "Account" --output text
       - name: Login to ECR
         run: aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin $(aws sts get-caller-identity --query "Account" --output text).dkr.ecr.$AWS_REGION.amazonaws.com
       - name: Deploy app
